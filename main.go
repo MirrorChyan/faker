@@ -8,6 +8,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type Response struct {
+	Code    int    `json:"code"`
+	Message string `json:"msg"`
+	Data    Data   `json:"data"`
+}
+
+type Data struct {
+	VersionName   string `json:"version_name"`
+	VersionNumber int    `json:"version_number"`
+	Channel       string `json:"channel"`
+	OS            string `json:"os,omitempty"`
+	Arch          string `json:"arch,omitempty"`
+	ReleaseNote   string `json:"release_note"`
+}
+
 func main() {
 	app := fiber.New(fiber.Config{
 		JSONEncoder: sonic.Marshal,
@@ -15,12 +30,21 @@ func main() {
 	})
 
 	app.Get("/resources/:rid/latest", func(c *fiber.Ctx) error {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"code": 0,
-			"msg":  "server is under maintenance",
-			"data": fiber.Map{
-				"version_name":   "",
-				"version_number": 0,
+		current_version := c.Query("current_version")
+		channel := c.Query("channel", "stable")
+		os := c.Query("os")
+		arch := c.Query("arch")
+
+		return c.Status(fiber.StatusOK).JSON(Response{
+			Code:    0,
+			Message: "server is under maintenance",
+			Data: Data{
+				VersionName:   current_version,
+				VersionNumber: 0,
+				Channel:       channel,
+				OS:            os,
+				Arch:          arch,
+				ReleaseNote:   "",
 			},
 		})
 	})
