@@ -6,6 +6,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 type Response struct {
@@ -29,22 +30,22 @@ func main() {
 		JSONDecoder: sonic.Unmarshal,
 	})
 
+	app.Use(logger.New())
+
 	app.Get("/resources/:rid/latest", func(c *fiber.Ctx) error {
-		current_version := c.Query("current_version")
+		currentVersion := c.Query("current_version")
 		channel := c.Query("channel", "stable")
 		os := c.Query("os")
 		arch := c.Query("arch")
 
 		return c.Status(fiber.StatusOK).JSON(Response{
 			Code:    0,
-			Message: "server is under maintenance",
+			Message: "server is under maintenance, so i am faker",
 			Data: Data{
-				VersionName:   current_version,
-				VersionNumber: 0,
-				Channel:       channel,
-				OS:            os,
-				Arch:          arch,
-				ReleaseNote:   "",
+				VersionName: currentVersion,
+				Channel:     channel,
+				OS:          os,
+				Arch:        arch,
 			},
 		})
 	})
