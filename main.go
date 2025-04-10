@@ -28,9 +28,12 @@ func main() {
 	app := fiber.New(fiber.Config{
 		JSONEncoder: sonic.Marshal,
 		JSONDecoder: sonic.Unmarshal,
+		ProxyHeader: fiber.HeaderXForwardedFor,
 	})
 
-	app.Use(logger.New())
+	app.Use(logger.New(logger.Config{
+		Format: "${time} | ${status} | ${latency} | ${ip} | ${method} | ${path}?${queryParams} | ${error}\n",
+	}))
 
 	app.Get("/resources/:rid/latest", func(c *fiber.Ctx) error {
 		currentVersion := c.Query("current_version")
@@ -38,7 +41,7 @@ func main() {
 		os := c.Query("os")
 		arch := c.Query("arch")
 
-		return c.Status(fiber.StatusOK).JSON(Response{
+		return c.JSON(Response{
 			Code:    0,
 			Message: "server is under maintenance, so i am faker",
 			Data: Data{
